@@ -1,0 +1,4 @@
+[submodule "external/ElitePlayerJournal"]
+	path = external/ElitePlayerJournal
+	url = https://github.com/nzgeek/ElitePlayerJournal.git
+	url = git@github.com:nzgeek/ElitePlayerJournal.git
