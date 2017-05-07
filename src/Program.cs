@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace NZgeek.EliteScreenshotConverter
@@ -17,11 +16,6 @@ namespace NZgeek.EliteScreenshotConverter
         {
             var journal = new Journal();
             journal.Load();
-
-            foreach (var gameEvent in journal.FindEvents())
-            {
-                WriteEvent(gameEvent);
-            }
 
             var screenshots = Enumerable.Reverse(journal.FindEvents(EventType.Screenshot));
             foreach (Screenshot screenshot in screenshots)
@@ -34,22 +28,6 @@ namespace NZgeek.EliteScreenshotConverter
 
                 ConvertScreenshot(screenshot);
             }
-        }
-
-        static void WriteEvent(Event gameEvent)
-        {
-            Console.WriteLine("[{0:yyyy/MM/dd HH:MM:ss}] {1}", gameEvent.Timestamp, gameEvent.RawType);
-
-            var properties = gameEvent.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                if (property.DeclaringType == typeof(Event))
-                    continue;
-
-                var value = property.GetValue(gameEvent);
-                Console.WriteLine("    {0,-20} {1}", property.Name + ":", value);
-            }
-
         }
 
         static void ConvertScreenshot(Screenshot screenshot)
