@@ -24,7 +24,7 @@ namespace NZgeek.EliteScreenshotConverter
             var screenshotEvents = Enumerable.Reverse(journal.FindEvents(startDate, endDate, EventType.Screenshot));
             foreach (Screenshot screenshotEvent in screenshotEvents)
             {
-                Console.WriteLine("[{0:yyyy/MM/dd HH:mm:ss}] {1}  @  {2}{3}",
+                Console.WriteLine("[{0:yyyy/MM/dd HH:mm:ss}] {1} @ {2}{3}",
                     screenshotEvent.Timestamp,
                     screenshotEvent.FilePath,
                     screenshotEvent.SystemName,
