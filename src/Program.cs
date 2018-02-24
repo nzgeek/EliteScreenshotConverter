@@ -21,16 +21,16 @@ namespace NZgeek.EliteScreenshotConverter
             var startDate = ParseStartDateArgument(args);
             var endDate = ParseEndDateArgument(args);
 
-            var screenshots = Enumerable.Reverse(journal.FindEvents(startDate, endDate, EventType.Screenshot));
-            foreach (Screenshot screenshot in screenshots)
+            var screenshotEvents = Enumerable.Reverse(journal.FindEvents(startDate, endDate, EventType.Screenshot));
+            foreach (Screenshot screenshotEvent in screenshotEvents)
             {
                 Console.WriteLine("[{0:yyyy/MM/dd HH:mm:ss}] {1}  @  {2}{3}",
-                    screenshot.Timestamp,
-                    screenshot.FilePath,
-                    screenshot.SystemName,
-                    !string.IsNullOrEmpty(screenshot.Body) ? $" ({screenshot.Body})" : null);
+                    screenshotEvent.Timestamp,
+                    screenshotEvent.FilePath,
+                    screenshotEvent.SystemName,
+                    !string.IsNullOrEmpty(screenshotEvent.Body) ? $" ({screenshotEvent.Body})" : null);
 
-                ConvertScreenshot(screenshot);
+                ConvertScreenshot(screenshotEvent);
             }
 
             Console.WriteLine("Press enter to exit");
@@ -61,27 +61,27 @@ namespace NZgeek.EliteScreenshotConverter
             return DateTime.MinValue;
         }
 
-        static void ConvertScreenshot(Screenshot screenshot)
+        static void ConvertScreenshot(Screenshot screenshotEvent)
         {
-            if (!File.Exists(screenshot.FilePath))
+            if (!File.Exists(screenshotEvent.FilePath))
                 return;
 
-            var convertedFolder = Path.Combine(screenshot.Journal.ScreenShotFolder, "Converted");
+            var convertedFolder = Path.Combine(screenshotEvent.Journal.ScreenShotFolder, "Converted");
             Directory.CreateDirectory(convertedFolder);
 
-            var convertedFileName = BuildFileName(screenshot);
+            var convertedFileName = BuildFileName(screenshotEvent);
             var convertedFilePath = Path.Combine(convertedFolder, convertedFileName.ToString());
 
-            using (var sourceImage = new Bitmap(screenshot.FilePath))
+            using (var sourceImage = new Bitmap(screenshotEvent.FilePath))
             {
                 sourceImage.Save(convertedFilePath, ImageFormat.Jpeg);
             }
 
-            File.Delete(screenshot.FilePath);
+            File.Delete(screenshotEvent.FilePath);
 
-            if (screenshot.Timestamp != DateTime.MinValue)
+            if (screenshotEvent.Timestamp != DateTime.MinValue)
             {
-                File.SetCreationTime(convertedFilePath, screenshot.Timestamp);
+                File.SetCreationTime(convertedFilePath, screenshotEvent.Timestamp);
             }
         }
 
