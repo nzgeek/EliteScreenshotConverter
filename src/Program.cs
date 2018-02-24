@@ -32,6 +32,9 @@ namespace NZgeek.EliteScreenshotConverter
 
                 ConvertScreenshot(screenshot);
             }
+
+            Console.WriteLine("Press enter to exit");
+            Console.ReadLine();
         }
 
         private static DateTime ParseEndDateArgument(string[] args)
