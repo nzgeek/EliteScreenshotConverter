@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>NZgeek.EliteScreenshotConverter</RootNamespace>
     <AssemblyName>EliteScreenshotConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -40,9 +40,6 @@
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NZgeek.ElitePlayerJournal, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\NZgeek.ElitePlayerJournal.0.1.0\lib\net452\NZgeek.ElitePlayerJournal.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,6 +52,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ElitePlayerJournal\src\ElitePlayerJournal.net452.csproj">
+      <Project>{195b246a-62a6-4399-944a-4ad55e722994}</Project>
+      <Name>ElitePlayerJournal.net452</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

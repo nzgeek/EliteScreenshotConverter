@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace NZgeek.EliteScreenshotConverter
@@ -17,36 +18,71 @@ namespace NZgeek.EliteScreenshotConverter
             var journal = new Journal();
             journal.Load();
 
-            var screenshots = Enumerable.Reverse(journal.FindEvents(EventType.Screenshot));
-            foreach (Screenshot screenshot in screenshots)
-            {
-                Console.WriteLine("[{0:yyyy/MM/dd HH:mm:ss}] {1}  @  {2}{3}",
-                    screenshot.Timestamp,
-                    screenshot.FilePath,
-                    screenshot.SystemName,
-                    !string.IsNullOrEmpty(screenshot.Body) ? $" ({screenshot.Body})" : null);
+            var startDate = ParseStartDateArgument(args);
+            var endDate = ParseEndDateArgument(args);
 
-                ConvertScreenshot(screenshot);
+            var screenshotEvents = Enumerable.Reverse(journal.FindEvents(startDate, endDate, EventType.Screenshot));
+            foreach (Screenshot screenshotEvent in screenshotEvents)
+            {
+                Console.WriteLine("[{0:yyyy/MM/dd HH:mm:ss}] {1} @ {2}{3}",
+                    screenshotEvent.Timestamp,
+                    screenshotEvent.FilePath,
+                    screenshotEvent.SystemName,
+                    !string.IsNullOrEmpty(screenshotEvent.Body) ? $" ({screenshotEvent.Body})" : null);
+
+                ConvertScreenshot(screenshotEvent);
             }
+
+            Console.WriteLine("Press enter to exit");
+            Console.ReadLine();
         }
 
-        static void ConvertScreenshot(Screenshot screenshot)
+        private static DateTime ParseEndDateArgument(string[] args)
         {
-            if (!File.Exists(screenshot.FilePath))
+            if (args.Length < 2) return DateTime.MaxValue;
+
+            if (DateTime.TryParse(args[1], out DateTime date))
+            {
+                return date;
+            }
+
+            return DateTime.MaxValue;
+        }
+
+        private static DateTime ParseStartDateArgument(string[] args)
+        {
+            if (args.Length < 1) return DateTime.MinValue;
+
+            if (DateTime.TryParse(args[0], out DateTime date))
+            {
+                return date;
+            }
+
+            return DateTime.MinValue;
+        }
+
+        static void ConvertScreenshot(Screenshot screenshotEvent)
+        {
+            if (!File.Exists(screenshotEvent.FilePath))
                 return;
 
-            var convertedFolder = Path.Combine(screenshot.Journal.ScreenShotFolder, "Converted");
+            var convertedFolder = Path.Combine(screenshotEvent.Journal.ScreenShotFolder, "Converted");
             Directory.CreateDirectory(convertedFolder);
 
-            var convertedFileName = BuildFileName(screenshot);
+            var convertedFileName = BuildFileName(screenshotEvent);
             var convertedFilePath = Path.Combine(convertedFolder, convertedFileName.ToString());
 
-            using (var sourceImage = new Bitmap(screenshot.FilePath))
+            using (var sourceImage = new Bitmap(screenshotEvent.FilePath))
             {
                 sourceImage.Save(convertedFilePath, ImageFormat.Jpeg);
             }
 
-            File.Delete(screenshot.FilePath);
+            File.Delete(screenshotEvent.FilePath);
+
+            if (screenshotEvent.Timestamp != DateTime.MinValue)
+            {
+                File.SetCreationTime(convertedFilePath, screenshotEvent.Timestamp);
+            }
         }
 
         static string BuildFileName(Screenshot screenshot)
@@ -65,7 +101,8 @@ namespace NZgeek.EliteScreenshotConverter
             {
                 fileName.Append(screenshot.SystemName);
                 fileName.Append(" @ ");
-                fileName.Append(screenshot.Body);
+                var bodyName = screenshot.Body?.Replace(screenshot.SystemName, "");
+                fileName.Append(bodyName);
             }
 
             fileName.AppendFormat("{0:' ('yyyyMMdd-HHmmss')'}", screenshot.Timestamp);
@@ -77,7 +114,7 @@ namespace NZgeek.EliteScreenshotConverter
 
             fileName.Append(".jpg");
 
-            return fileName.ToString();
+            return fileName.ToString().Replace("  ", " ");
         }
     }
 }
